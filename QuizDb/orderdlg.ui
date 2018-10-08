@@ -1,0 +1,192 @@
+<ui version="4.0" >
+ <class>orderdlg</class>
+ <widget class="QWidget" name="orderdlg" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>270</width>
+    <height>161</height>
+   </rect>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>270</width>
+    <height>160</height>
+   </size>
+  </property>
+  <property name="windowTitle" >
+   <string>Select Order</string>
+  </property>
+  <widget class="QSplitter" name="splitter1" >
+   <property name="geometry" >
+    <rect>
+     <x>0</x>
+     <y>130</y>
+     <width>264</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <widget class="QPushButton" name="OK" >
+    <property name="text" >
+     <string>OK</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Cancel" >
+    <property name="text" >
+     <string>Cancel</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox2" >
+   <property name="geometry" >
+    <rect>
+     <x>140</x>
+     <y>10</y>
+     <width>111</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Secondary Sort</string>
+   </property>
+   <widget class="QRadioButton" name="alphabutton_2" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>By Alpha</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="typebutton_2" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>By Type</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="versebutton_2" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>By Verse</string>
+    </property>
+    <property name="checked" >
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox1" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>111</width>
+     <height>111</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Primary Sort</string>
+   </property>
+   <widget class="QRadioButton" name="alphabutton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>By Alpha</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="typebutton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>By Type</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="versebutton" >
+    <property name="geometry" >
+     <rect>
+      <x>10</x>
+      <y>20</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>By Verse</string>
+    </property>
+    <property name="checked" >
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>OK</sender>
+   <signal>clicked()</signal>
+   <receiver>orderdlg</receiver>
+   <slot>OK_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Cancel</sender>
+   <signal>clicked()</signal>
+   <receiver>orderdlg</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

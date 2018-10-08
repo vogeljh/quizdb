@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>459</width>
+    <height>418</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <widget class="QDialogButtonBox" name="OkBox">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>380</y>
+     <width>161</width>
+     <height>32</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="standardButtons">
+    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QGroupBox" name="fromBox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>10</y>
+     <width>281</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Verse range from:</string>
+   </property>
+   <widget class="QSpinBox" name="verse1">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>30</y>
+      <width>50</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="book1">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>151</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="chapter1">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>30</y>
+      <width>50</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="ToBox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>70</y>
+     <width>281</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Verse range to:</string>
+   </property>
+   <widget class="QSpinBox" name="verse2">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>30</y>
+      <width>50</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="book2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>151</width>
+      <height>22</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="chapter2">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>30</y>
+      <width>50</width>
+      <height>22</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="formatBox">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>260</y>
+     <width>141</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Choose Format</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+   </property>
+   <widget class="QRadioButton" name="noanswerbutton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>120</y>
+      <width>107</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>No Answers</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="sidebysidebutton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>90</y>
+      <width>110</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Side-by-Side</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="fronttobackbutton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>60</y>
+      <width>110</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Front-to-Back</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="twocolumnbutton">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>30</y>
+      <width>90</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>2 columns</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="sortBox1">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>130</y>
+     <width>141</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Primary Sort</string>
+   </property>
+   <widget class="QRadioButton" name="alphabutton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>By Alpha</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="typebutton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>By Type</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="versebutton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>By Verse</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="sortBox2">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>130</y>
+     <width>141</width>
+     <height>121</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Secondary Sort</string>
+   </property>
+   <widget class="QRadioButton" name="alphabutton2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>By Alpha</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="typebutton2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>60</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>By Type</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="versebutton2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>80</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>By Verse</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="outputBox">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>260</y>
+     <width>141</width>
+     <height>91</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Select Output</string>
+   </property>
+   <widget class="QRadioButton" name="LaTeXButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>103</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>LaTeX</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="RTFButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>103</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Rich Text</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="KeyWordBox">
+   <property name="geometry">
+    <rect>
+     <x>140</x>
+     <y>350</y>
+     <width>141</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Key Words</string>
+   </property>
+   <widget class="QRadioButton" name="KeyWordButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Highlight</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QWidget" name="verticalLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>60</y>
+     <width>161</width>
+     <height>271</height>
+    </rect>
+   </property>
+   <layout class="QVBoxLayout" name="TypeBox"/>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>book1</tabstop>
+  <tabstop>chapter1</tabstop>
+  <tabstop>verse1</tabstop>
+  <tabstop>book2</tabstop>
+  <tabstop>chapter2</tabstop>
+  <tabstop>verse2</tabstop>
+  <tabstop>versebutton</tabstop>
+  <tabstop>typebutton</tabstop>
+  <tabstop>alphabutton</tabstop>
+  <tabstop>versebutton2</tabstop>
+  <tabstop>typebutton2</tabstop>
+  <tabstop>alphabutton2</tabstop>
+  <tabstop>twocolumnbutton</tabstop>
+  <tabstop>fronttobackbutton</tabstop>
+  <tabstop>sidebysidebutton</tabstop>
+  <tabstop>noanswerbutton</tabstop>
+  <tabstop>LaTeXButton</tabstop>
+  <tabstop>RTFButton</tabstop>
+  <tabstop>OkBox</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

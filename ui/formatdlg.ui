@@ -1,0 +1,150 @@
+<ui version="4.0" >
+ <class>formatdlg</class>
+ <widget class="QWidget" name="formatdlg" >
+  <property name="geometry" >
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>280</width>
+    <height>207</height>
+   </rect>
+  </property>
+  <property name="minimumSize" >
+   <size>
+    <width>270</width>
+    <height>200</height>
+   </size>
+  </property>
+  <property name="windowTitle" >
+   <string>Print format</string>
+  </property>
+  <widget class="QSplitter" name="splitter1" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>170</y>
+     <width>264</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="orientation" >
+    <enum>Qt::Horizontal</enum>
+   </property>
+   <widget class="QPushButton" name="OK" >
+    <property name="text" >
+     <string>OK</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="Cancel" >
+    <property name="text" >
+     <string>Cancel</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox" >
+   <property name="geometry" >
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>251</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="title" >
+    <string>Format:</string>
+   </property>
+   <widget class="QRadioButton" name="noanswerbutton" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>110</y>
+      <width>107</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>No Answers</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="sidebysidebutton" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>80</y>
+      <width>110</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Side-by-Side</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="fronttobackbutton" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>50</y>
+      <width>110</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>Front-to-Back</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="twocolumnbutton" >
+    <property name="geometry" >
+     <rect>
+      <x>20</x>
+      <y>20</y>
+      <width>90</width>
+      <height>20</height>
+     </rect>
+    </property>
+    <property name="text" >
+     <string>2 columns</string>
+    </property>
+    <property name="checked" >
+     <bool>true</bool>
+    </property>
+   </widget>
+  </widget>
+ </widget>
+ <layoutdefault spacing="6" margin="11" />
+ <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>OK</sender>
+   <signal>clicked()</signal>
+   <receiver>formatdlg</receiver>
+   <slot>OK_clicked()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>Cancel</sender>
+   <signal>clicked()</signal>
+   <receiver>formatdlg</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel" >
+     <x>20</x>
+     <y>20</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
