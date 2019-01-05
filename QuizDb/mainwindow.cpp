@@ -231,7 +231,7 @@ int MainWindow::LoadDb()
         db->setDatabaseName( dbpath );
         if( !db->open() )
         {
-            Err( QString( "Can't open database: %1, database path: %2" ).arg( db->lastError().text(), dbpath ) );
+            Err( QString( "Can't open database: %1. Database path: %2" ).arg( db->lastError().text(), dbpath ) );
             db->close();
             if( GetDatabase( CHANGEDB ) )
             {
@@ -352,7 +352,7 @@ int MainWindow::GetDatabase( int dbmode )
     db->setDatabaseName( dbpath );
     if( !db->open() )
     {
-        Err( QString( "Database name set successfully, but unable to open it: %1, database path: %2" ).arg( db->lastError().text(), dbpath ) );
+        Err( QString( "Database name set successfully, but unable to open it: %1. Database path: %2" ).arg( db->lastError().text(), dbpath ) );
         db->close();
         dbpath.clear();
         return( -1 );
