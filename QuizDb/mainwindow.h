@@ -13,6 +13,7 @@
 #define FRONTTOBACK 1
 #define SIDEBYSIDE 2
 #define NOANSWER 3
+#define INDEX 4
 #define NEWDB 0
 #define CHANGEDB 1
 #define HIGHLIGHT 2

@@ -43,8 +43,9 @@ public:
 	void printRTFQuestions();
 	QString MainTitle();
 	QString SectionTitle( int, QString );
-	void FrontToBack( QTextStream*, int );
-	QString selectedTypesTitle();
+    void FrontToBack( QTextStream*, int );
+    void IndexCard( QTextStream*, int );
+    QString selectedTypesTitle();
 	QString verseRangeTitle();
 
 public slots:
