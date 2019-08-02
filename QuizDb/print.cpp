@@ -216,8 +216,10 @@ void print::okClicked()
 		printFormat = FRONTTOBACK;
 	else if( sidebysidebutton->isChecked() )
 		printFormat = SIDEBYSIDE;
-	else/* if( noanswerbutton->isChecked() )*/
-		printFormat = NOANSWER;
+    else if( noanswerbutton->isChecked() )
+        printFormat = NOANSWER;
+    else /*if( indexbutton->isChecked() )*/
+        printFormat = INDEX;
 
 //set output format
 	if( LaTeXButton->isChecked() )
@@ -305,12 +307,21 @@ void print::printLaTeXQuestions()
 		startlist = QString( "\\begin{qseplist}\n" );
 		endlist = QString( "\\end{qseplist}\n" );
 //		numrows = InputBox("How many rows? ", "Front-To-Back Format", 10)
-		numrows = 10;
-		int qht = 44 / numrows * 18 - 1;
-		out << "\\fronttoback\n";
-		out << "\\setlength{\\qht}{" << qht << "pt}\n";
+        numrows = 10;
+        int qht = 44 / numrows * 18 - 1;
+        out << "\\fronttoback\n";
+        out << "\\setlength{\\qht}{" << qht << "pt}\n";
 	}
-	else
+    else if( printFormat == INDEX )
+    {
+        startlist = QString( "\n" );
+        endlist = QString( "\n" );
+//		numrows = InputBox("How many rows? ", "Front-To-Back Format", 3)
+        numrows = 3;
+        int qsep = 220;
+        out << "\\indexcard\n";
+    }
+    else
 	{
 		startlist = QString( "\\begin{qlist}\n" );
 		endlist = QString( "\\end{qlist}\n" );
@@ -324,12 +335,17 @@ void print::printLaTeXQuestions()
 		}
 	}
 	out << "\\begin{document}\n";
-	if( printFormat == FRONTTOBACK )
-	{
-		out << startlist;
-		FrontToBack( &out, numrows );
-	}
-	else
+    if( printFormat == FRONTTOBACK )
+    {
+        out << startlist;
+        FrontToBack( &out, numrows );
+    }
+    else if( printFormat == INDEX )
+    {
+        out << startlist;
+        IndexCard( &out, numrows );
+    }
+    else
 	{
 		out << MainTitle();
 		if( primary.compare( "VID" ) == 0)// == ORDERBYVERSE )
@@ -575,97 +591,119 @@ QString print::SectionTitle( int sections, QString stitle )
 
 void print::FrontToBack( QTextStream *out, int numrows )
 {
-	int i, row, column, donerow, donecol;
-	questClass *question;
-	bool done;
-	
-	done = false;
-	i = 0;
-	while( !done )
-	{
-		for( column=0; column<2; column++ )
-		{
-			for( row=donecol=0, donerow=numrows; row<numrows; row++ )
-			{
-				if( i == numQuest )
-				{
-					done = true;
-					if( row > 0 )
-					{
-						donerow = row;
-						donecol = column;
-					}
-					break;
-				}
-				else
-				{
-					question = new questClass( qmodel.record( i ) );
-					question->setLaTeX( true );
-					question->showAnswer( false );
-					if( !showKey )
-						question->showKeyWords( false );
-					(*out) << question->formatted();
-					delete question;
-					i++;
-				}
-			}
-			if( row > 0 )
-				(*out) << "\\newpage\n";
-			if( done )
-			{
-				if( donecol == 0 )
-				{
-					(*out) << "\\mbox{}\n";
-					(*out) << "\\newpage\n";
-				}
-				break;
-			}
-		}
-		for( column=0; column<2; column++ )
-		{
-			if( done )
-			{
-				if( donecol == 0 )
-				{
-					(*out) << "\\mbox{}\n";
-					(*out) << "\\newpage\n";
-					column++;
-					i -= donerow;
-				}
-				else
-				{
-					if( column == 0 )
-						i -= donerow;
-					else
-						i -= (donerow + numrows);
-				}
-			}
-			else
-				i -= (column+1)*numrows;
-			for( row=0; row<numrows; row++ )
-			{
-				question = new questClass( qmodel.record( i ) );
-				question->setLaTeX( true );
-				question->showQuestion( false );
-				if( !showKey )
-					question->showKeyWords( false );
-				(*out) << question->formatted();
-				delete question;
-				if( ++i == numQuest )
-					break;
-			}
+    int i, row, column, donerow, donecol;
+    questClass *question;
+    bool done;
+
+    done = false;
+    i = 0;
+    while( !done )
+    {
+        for( column=0; column<2; column++ )
+        {
+            for( row=donecol=0, donerow=numrows; row<numrows; row++ )
+            {
+                if( i == numQuest )
+                {
+                    done = true;
+                    if( row > 0 )
+                    {
+                        donerow = row;
+                        donecol = column;
+                    }
+                    break;
+                }
+                else
+                {
+                    question = new questClass( qmodel.record( i ) );
+                    question->setLaTeX( true );
+                    question->showAnswer( false );
+                    if( !showKey )
+                        question->showKeyWords( false );
+                    (*out) << question->formatted();
+                    delete question;
+                    i++;
+                }
+            }
+            if( row > 0 )
+                (*out) << "\\newpage\n";
+            if( done )
+            {
+                if( donecol == 0 )
+                {
+                    (*out) << "\\mbox{}\n";
+                    (*out) << "\\newpage\n";
+                }
+                break;
+            }
+        }
+        for( column=0; column<2; column++ )
+        {
+            if( done )
+            {
+                if( donecol == 0 )
+                {
+                    (*out) << "\\mbox{}\n";
+                    (*out) << "\\newpage\n";
+                    column++;
+                    i -= donerow;
+                }
+                else
+                {
+                    if( column == 0 )
+                        i -= donerow;
+                    else
+                        i -= (donerow + numrows);
+                }
+            }
+            else
+                i -= (column+1)*numrows;
+            for( row=0; row<numrows; row++ )
+            {
+                question = new questClass( qmodel.record( i ) );
+                question->setLaTeX( true );
+                question->showQuestion( false );
+                if( !showKey )
+                    question->showKeyWords( false );
+                (*out) << question->formatted();
+                delete question;
+                if( ++i == numQuest )
+                    break;
+            }
 //			if( done && (column == 0) && (donecol == 0) )
 //			{
 //				out << "\\mbox{}\n";
 //			}
-			if( !done || ((column == 0) && (donecol == 1)) )
-				(*out) << "\\newpage\n";
-		}
-		if( !done )
-			i += numrows;
-		if( i == numQuest )
-			done = true;
-	}
+            if( !done || ((column == 0) && (donecol == 1)) )
+                (*out) << "\\newpage\n";
+        }
+        if( !done )
+            i += numrows;
+        if( i == numQuest )
+            done = true;
+    }
+}
+
+void print::IndexCard( QTextStream *out, int numrows )
+{
+    int i, row, column, donerow, donecol;
+    questClass *question;
+    bool done;
+
+    for( i=0; i<numQuest; i++ )
+    {
+        question = new questClass( qmodel.record( i ) );
+        question->setLaTeX( true );
+        question->showAnswer( true );
+        if( !showKey )
+            question->showKeyWords( false );
+        (*out) << "\\begin{minipage}[b][3.6in][c]{2.8in}\n";
+        (*out) << "\\begin{qlist}\n";
+        (*out) << question->formatted();
+        (*out) << "\\end{qlist}\n";
+        (*out) << "\\end{minipage}\\\\\n";
+        delete question;
+    }
 }
 
 QString print::selectedTypesTitle()
