@@ -3,14 +3,19 @@
 
 #include <QWidget>
 #include <QTabWidget>
+#include <QTableView>
 #include <QLineEdit>
 #include <QLabel>
 #include <QSqlDatabase>
 #include <QHeaderView>
 #include <QMenu>
 #include <QContextMenuEvent>
+#include <QSqlQuery>
+#include <QSqlQueryModel>
 #include "quizclass.h"
 #include "quizreview.h"
+#include "quizquestmodel.h"
+#include "quizquesteditview.h"
 
 class QAction;
 class QActionGroup;
@@ -25,6 +30,11 @@ public:
 
 	void Err( QString );
 	bool replaceQuestion( int, int );
+    QString *GetQuestQuery();
+    void updateQuizModel( int tab );
+    void sizeQuizEditView();
+    void updateQuestion( int qnum );
+//    void cancelEdit();
 
 public slots:
 	virtual void OK_clicked();
@@ -36,26 +46,34 @@ private slots:
 	void replace();
 	void moveUp();
 	void moveDown();
+    void editQuestion();
+    void editQuestionCopy();
 
 private:
 	quizreview *pwin;
 	quizClass *viewquiz;
-	QTabWidget *tabwidget;
+    quizQuestModel *quizQuestEditModel;
+    class quizQuestEditView *quizQuestEdit;
+    QTabWidget *tabwidget;
+    void editQuizQuestion( int copy );
+    QString quizEditQuestQuery;
 	QPushButton *ok, *cancel;
-//	int quiznum;
 	int section;
 	int qselected;
+    bool editquestioncopied;
+    int copied_qid;
 	QSpinBox *Sequence;
 	QLineEdit *ref[MAXSECTIONS];
 	QLineEdit *header[MAXSECTIONS];
 	QLineEdit *quest[MAXSECTIONS];
 	QLineEdit *answer[MAXSECTIONS];
 	QHeaderView *vheader[MAXSECTIONS];
-//	QHeaderView *vheader;
 	void createMenu();
 	QAction *replaceAct;
 	QAction *moveUpAct;
 	QAction *moveDownAct;
+    QAction *editQuestionAct;
+    QAction *editQuestionCopyAct;
 };
 
 #endif // __QUIZVIEW_H__

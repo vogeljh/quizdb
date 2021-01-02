@@ -10,7 +10,7 @@ questModel::questModel( QObject *parent, QTableView *qv )
     : QSqlQueryModel( parent )
 {
     pwin = (MainWindow *)parent;
-	qview = qv;
+    qview = qv;
 	keyOpen = false;
 }
 
@@ -285,7 +285,7 @@ bool questModel::showKey()
 	QString kQuery, aQuery, keyItem, keyItem2;
 
 	id = qview->currentIndex();
-	vid = index(id.row(),10).data().toInt();
+    vid = index(id.row(),10).data().toInt()-1; // added "-1" on 30-Dec-2020
 	numverses = index(id.row(),11).data().toInt();
 	kQuery = QString( "SELECT VID,Word FROM KView WHERE VID>%1 AND VID<%2" )
 				.arg(vid-1).arg(vid+numverses+1);

@@ -102,7 +102,7 @@ void quizQuestionClass::setQuestion( int qid, int key, int vid )
 		return;
 	}
 
-	if( qzModel.rowCount() > 0 )
+    if( qzModel.rowCount() > 0 )
 	{
 		query.exec( QString( "DELETE FROM Quiz WHERE " )
 					.append( "qnum=%1 AND section=%2 and quiznum=%3" )
@@ -138,8 +138,7 @@ void quizQuestionClass::setQuestion( int qid, int key, int vid )
         quest->setHighlight( true );
     else
         quest->setHighlight( false );
-//	quest->setLaTeX( true );
-	quest->shiftFtv( true );
+    quest->shiftFtv( false );
 }
 
 int quizQuestionClass::verseIndex()

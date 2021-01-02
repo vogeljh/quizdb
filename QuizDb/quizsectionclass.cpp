@@ -25,15 +25,18 @@
 #include "errmsg.h"
 #include "quizsectionclass.h"
 //
-quizSectionClass::quizSectionClass( int quiznum, int sectionnum, int printformat )
+quizSectionClass::quizSectionClass( int quiznum, int sectionnum, int questcount, int printformat )
 {
 	int i;
 	QSqlQueryModel qzModel, qModel;
 	
 	qSCquiznum = quiznum;
 	qSCsecnum = sectionnum;
-//	Err( QString( "qSCsecnum=%1; sectionnum=%2").arg(qSCsecnum).arg(sectionnum) );
-	loadQuizFormat();
+    qCount = questcount;
+//	loadQuizFormat();
+/* loadquizformat is now called when actually making a quiz, not when declaring it. If the declaration
+ * was for a loaded quiz, this older method resulted in crashes when the quiz formats did not match.
+ */
 
 	for( i=0; i<qCount; i++ )
         qSCquest[i] = new quizQuestionClass( quiznum, sectionnum, i, printformat );
@@ -106,8 +109,10 @@ void quizSectionClass::loadQuizFormat()
 	}
 
 	secTitle = qmodel.record( 0 ).value( "Name" ).toString();
-	qCount = qmodel.record( 0 ).value( "count" ).toInt();
-//	Err( QString( "qCount=%1" ).arg(qCount) );
+    if( (qCount - qmodel.record( 0 ).value( "count" ).toInt()) )
+    {
+        Err( QString( "Question count does not match in section %1: qCount=%2" ).arg(qSCsecnum).arg(qCount) );
+    }
 	gentype = qmodel.record( 0 ).value( "gentype" ).toInt();
 	genqual = qmodel.record( 0 ).value( "genqual" ).toString();
 	qzBreak = qmodel.record( 0 ).value( "break" ).toBool();
@@ -309,8 +314,10 @@ int quizSectionClass::ChooseQuest( QSqlQueryModel *qmodel, const int qnum,
 				.append( "question %3.").arg( qSCquiznum+1 ).arg( qSCsecnum+1 )
 				.arg( qnum+1 ) );
     if( qSCsecnum < 3 )
+    {
         query.exec( QString( "UPDATE Questions SET Used = Used+1 WHERE QID = %1" )
 			.arg( qmodel->record( rnum ).value( "QID" ).toInt() ) );
+    }
 	if( query.lastError().isValid() )
 	{
 		Err( query.lastError().text() );
@@ -329,7 +336,12 @@ int quizSectionClass::makeSection()
     int i, j, id, qnum, rnum, qty, qzquestrows, row, allowed;
 	QList<int> avlbl, unused;
 	
-	unused.clear();
+// The function call to "loadquizformat" used to be in the declaration of the quiz section. But that does not make sense
+// if the declaration is meant to hold a quiz loaded from memory, where the loaded quiz may not match the currently
+// prescribed quiz design. But if we are making a new quiz, as here, then the prescribed quiz format should apply.
+    loadQuizFormat();
+//
+    unused.clear();
 	for( i=0; i<qCount; i++ )
 		unused << i;
 	for( row=0; row<qzdatarows; row++ )

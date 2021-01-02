@@ -29,7 +29,7 @@ private:
 	bool setCR( int qid, const QString &cr );
 	void refresh();
     MainWindow *pwin;
-	QTableView *qview;
+    QTableView *qview;
 	bool keyOpen;
 };
 

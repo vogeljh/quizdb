@@ -35,7 +35,7 @@ questClass::questClass( QSqlRecord record )
 		qCverse = record.value("Verse").toInt();
 		qCnumVerses = record.value("Verses").toInt();
 		qCquestCode = record.value("Qtype").toInt();
-		qCpreface = record.value("Header").toString(); 
+        qCpreface = record.value("Header").toString();
 		qCquestion = record.value("Qtext").toString(); 
 		qCanswer = record.value("Answer").toString();
 		qCcrossRef = record.value("CR").toString();

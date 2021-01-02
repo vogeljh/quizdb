@@ -172,7 +172,7 @@ void quizreview::printLaTeXQuizzes()
 		out << "\\quiz{Quiz \\#" << quiznum+1 << "}\n";
 		for( section=0; section<reviewQuiz[quiznum]->sectionCount(); section++ )
 		{
-			if( section )
+            if( section )
 			{
 				if( section < reviewQuiz[quiznum]->sectionCount() && 
 						reviewQuiz[quiznum]->section(section)->isBreak() )
@@ -183,8 +183,7 @@ void quizreview::printLaTeXQuizzes()
 			}
 			out << "\\begin{qnumlist}\n";
 
-			for( questnum=0; questnum<reviewQuiz[quiznum]->section(section)->
-						questCount(); questnum++ )
+            for( questnum=0; questnum<reviewQuiz[quiznum]->questionCount(section); questnum++ )
 			{
 				out << reviewQuiz[quiznum]->section(section)->
 						question(questnum)->formatted();

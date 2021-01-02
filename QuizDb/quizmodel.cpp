@@ -177,3 +177,9 @@ bool quizModel::moveDown()
 	int qnum = qview->currentIndex().row();
 	return( swap( qnum, qnum+1 ) );
 }
+
+int quizModel::quizQuestNumber()
+{
+    int qnum = qview->currentIndex().row();
+    return( qnum );
+}

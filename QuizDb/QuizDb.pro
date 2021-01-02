@@ -31,7 +31,9 @@ SOURCES += main.cpp\
     keyview.cpp \
     codes.cpp \
     bible.cpp \
-    types.cpp
+    types.cpp \
+    quizquestmodel.cpp \
+    quizquesteditview.cpp
 
 HEADERS  += mainwindow.h \
     errmsg.h \
@@ -53,7 +55,9 @@ HEADERS  += mainwindow.h \
     codes.h \
     bible.h \
     types.h \
-    range.h
+    range.h \
+    quizquestmodel.h \
+    quizquesteditview.h
 
 FORMS += \
     errdlg.ui \

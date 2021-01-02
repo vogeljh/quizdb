@@ -20,7 +20,6 @@ quizview::quizview ( quizClass *quiz, QWidget* parent, Qt::WindowFlags fl )
 	setMinimumSize( 800, 720 );
 	pwin = (quizreview *)parent;
 	viewquiz = quiz;
-//	quiznum = qznum;
 	createMenu();
 
 	QVBoxLayout * v1 = new QVBoxLayout;
@@ -40,35 +39,13 @@ quizview::quizview ( quizClass *quiz, QWidget* parent, Qt::WindowFlags fl )
 	{
 		qzView[tab] = new QTableView;
 		tabwidget->addTab( qzView[tab], tabModel->record( tab ).value( "Name" ).toString() );
-//		vheader[tab] = qzView[tab]->verticalHeader();
-//		connect( (const QObject*)(vheader[tab]), SIGNAL(sectionClicked(int)), this, SLOT(qzEdit(int)) );
 
-		qzModel[tab] = new quizModel( quiz, quiz->quizNumber(), tab, this, qzView[tab] );
-		sql = QString( "SELECT q FROM QuizView "
-			"WHERE quiznum=%1 AND section=%2 ORDER BY qnum" )
-			.arg( quiz->quizNumber() ).arg( tab );
-		qzModel[tab]->setQuery( sql );
-		if( qzModel[tab]->lastError().isValid() )
-		{
-			pwin->Err( qzModel[tab]->lastError().text() );
-			return;
-		}
+        qzModel[tab] = new quizModel( quiz, quiz->quizNumber(), tab, this, qzView[tab] );
+        updateQuizModel( tab );
 
 		qzView[tab]->setModel( qzModel[tab] );
 		qzView[tab]->setColumnWidth( 0, 700 );
-		qzModel[tab]->setHeaderData( 0, Qt::Horizontal, tr( "Question" ) );
-
-/*
-		for( i=0; i<qzModel[tab]->rowCount(); i++ )
-		{
-			q = qzModel[tab]->record( i ).value( "q" ).toString();
-			j = q.indexOf( tr(" A. ") );
-			q.replace( j, 1, QString(QChar::LineSeparator).append( "      " ) );
-			q.insert(0, QString( "%1. ").arg( i+1 ) );
-			new QListWidgetItem( qzmodel.record( i ).value( "q" ).toString(), qzView[tab] );
-			new QListWidgetItem( q, qzView[tab] );
-		}
-*/
+//		qzModel[tab]->setHeaderData( 0, Qt::Horizontal, tr( "Question" ) );
 	}
 
 	QHBoxLayout * h1 = new QHBoxLayout;
@@ -99,8 +76,10 @@ void quizview::contextMenuEvent(QContextMenuEvent *event)
 	section = tabwidget->currentIndex();
 	menu.addAction(replaceAct);
 	menu.addAction(moveUpAct);
-	menu.addAction(moveDownAct);
-	menu.exec(event->globalPos());
+    menu.addAction(moveDownAct);
+    menu.addAction(editQuestionAct);
+    menu.addAction(editQuestionCopyAct);
+    menu.exec(event->globalPos());
 }
 
 void quizview::createMenu()
@@ -119,6 +98,16 @@ void quizview::createMenu()
 	moveDownAct->setShortcut(tr("Ctrl+D"));
 	moveDownAct->setStatusTip(tr("Move this question 1 spot later in the quiz"));
 	connect(moveDownAct, SIGNAL(triggered()), this, SLOT(moveDown()));
+
+    editQuestionAct = new QAction(tr("&Edit Question"), this);
+    editQuestionAct->setShortcut(tr("Ctrl+E"));
+    editQuestionAct->setStatusTip(tr("Edit the question"));
+    connect(editQuestionAct, SIGNAL(triggered()), this, SLOT(editQuestion()));
+
+    editQuestionCopyAct = new QAction(tr("Edit Question &Copy"), this);
+    editQuestionCopyAct->setShortcut(tr("Ctrl+C"));
+    editQuestionCopyAct->setStatusTip(tr("Edit a copy of the question"));
+    connect(editQuestionCopyAct, SIGNAL(triggered()), this, SLOT(editQuestionCopy()));
 }
 
 void quizview::replace()
@@ -140,3 +129,128 @@ bool quizview::replaceQuestion( int sec, int qnum )
 {
 	return( viewquiz->section(sec)->replaceQuestion( qnum ) );
 }
+
+void quizview::editQuestionCopy()
+{
+    editQuizQuestion( 1 );
+    editquestioncopied = true;
+}
+
+void quizview::editQuestion()
+{
+    editQuizQuestion( 0 );
+    editquestioncopied = false;
+}
+
+void quizview::editQuizQuestion( int copy )
+{
+    int qid, qnum, numrows;
+    QSqlQueryModel quizQueryModel;
+    QSqlQuery query;
+    QString sql;
+    bool ok;
+
+    qnum = qzModel[section]->quizQuestNumber();
+
+    sql = QString( "SELECT qid FROM QuizView where quiznum=%1 AND section=%2 AND qnum=%3" )
+                  .arg(viewquiz->quizNumber()).arg(section).arg(qnum);
+    quizQueryModel.setQuery( sql );
+    if( quizQueryModel.lastError().isValid() )
+    {
+        pwin->Err( quizQueryModel.lastError().text() );
+        return;
+    }
+
+    qid = quizQueryModel.record( 0 ).value( 0 ).toInt();
+
+    if( copy )
+    {
+        sql = QString( "INSERT INTO Questions (Book, Chapter, Verse, Qtype, "
+            "Quality, Verses, Preface, Question, Answer, CR) "
+            "SELECT Book, Chapter, Verse, Qtype, Quality, Verses, Preface, Question, "
+            "Answer, CR FROM Questions WHERE QID=%1" ).arg( qid );
+        ok = query.exec( sql );
+        if( !ok )
+            pwin->Err( query.lastError().text() );
+        ok = query.exec( "select last_insert_rowid()");
+        if( !ok )
+            pwin->Err( query.lastError().text() );
+        copied_qid = query.value( 0 ).toInt();
+    }
+
+    quizEditQuestQuery = QString( "SELECT QID,Ref,Tabbrev,Quality,Preface,Question,Answer,CR,Used,Qsort,VID,Verses FROM Quest" )
+            .append( " where QID = %1" ).arg( qid );
+
+    quizQuestEditModel = new quizQuestModel( this, section );
+    quizQuestEditModel->setQuery( quizEditQuestQuery );
+    if( quizQuestEditModel->lastError().isValid() )
+    {
+        pwin->Err( quizQuestEditModel->lastError().text() );
+        return;
+    }
+    if( (numrows=quizQuestEditModel->rowCount())-1 )
+    {
+        pwin->Err( QString( "edit query returned %1 rows." ).arg( numrows ) );
+    }
+
+    quizQuestEdit = new quizQuestEditView( this, qnum, Qt::Window );
+    quizQuestEdit->setQuizModel( quizQuestEditModel );
+    quizQuestEditModel->updateQuizQuestionModel();
+
+    quizQuestEdit->show();
+}
+
+void quizview::sizeQuizEditView()
+{
+    quizQuestEdit->sizeQuizQuestEditView();
+}
+
+QString *quizview::GetQuestQuery()
+{
+    return( &quizEditQuestQuery );
+}
+
+void quizview::updateQuizModel( int tab )
+{
+    QString sql;
+
+    sql = QString( "SELECT q FROM QuizView "
+        "WHERE quiznum=%1 AND section=%2 ORDER BY qnum" )
+        .arg( viewquiz->quizNumber() ).arg( tab );
+    qzModel[tab]->setQuery( sql );
+    if( qzModel[tab]->lastError().isValid() )
+    {
+        pwin->Err( qzModel[tab]->lastError().text() );
+        return;
+    }
+
+    qzModel[tab]->setHeaderData( 0, Qt::Horizontal, tr( "Question" ) );
+}
+
+void quizview::updateQuestion( int qnum )
+{
+    int qid, key, vid;
+
+    qid = viewquiz->section( section )->question( qnum )->qid();
+    key = viewquiz->section( section )->question( qnum )->key();
+    vid = viewquiz->section( section )->question( qnum )->vid();
+    viewquiz->section( section )->question( qnum )->setQuestion( qid, key, vid );
+    updateQuizModel( section );
+}
+
+/*
+ * See notes in quizquesteditview. As implemented, the changes were undone in the quiz view and the quiz class, but
+ * the changes in the main "Questions" table cannot be readily undone.
+void quizview::cancelEdit()
+{
+    QSqlQuery query;
+    bool ok;
+
+    if( editquestioncopied )
+    {
+        ok = query.exec( QString( "DELETE from Questions WHERE qid=%1").arg(copied_qid) );
+        if( !ok )
+            pwin->Err( query.lastError().text() );
+    }
+}
+*/

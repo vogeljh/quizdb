@@ -41,11 +41,16 @@ public:
 public slots:
 	virtual void OK_clicked();
 	virtual void AddSection_clicked();
-	virtual void AddRow0_clicked();
-	virtual void AddRow1_clicked();
-	virtual void AddRow2_clicked();
-	virtual void AddRow3_clicked();
-	virtual void DeleteSection_clicked();
+//	virtual void AddRow_clicked()[MAXSECTIONS];
+    virtual void AddRow0_clicked();
+    virtual void AddRow1_clicked();
+    virtual void AddRow2_clicked();
+    virtual void AddRow3_clicked();
+//    virtual void DeleteSection_clicked()[MAXSECTIONS];
+    virtual void DeleteSection0_clicked();
+    virtual void DeleteSection1_clicked();
+    virtual void DeleteSection2_clicked();
+    virtual void DeleteSection3_clicked();
 
 protected:
 //	MainWindowImpl* pwin;
@@ -54,16 +59,18 @@ protected:
 	QWidget *sectionWidget[MAXSECTIONS];
 	int numsections;
 	QRadioButton *cb[MAXCODES];
-	QPushButton *ok, *cancel, *addsection, *deletesection;
+    QPushButton *ok, *cancel, *addsection;//, *deletesection;
 	void Err( QString );
 
 	QSqlQueryModel quizFormat;
 	QSqlQueryModel quizData;
 	void sectionEditTab( int );
-	void AddNewRow( int );
-	int updateQuizFormat( int );
+    void AddNewRow( int );
+    void DeleteExistingSection( int );
+    int updateQuizFormat( int );
 	QPushButton *AddRow[MAXSECTIONS];
-	int section, row0, row1;
+    QPushButton *DeleteSection[MAXSECTIONS];
+    int section, row0, row1;
 	QSpinBox *Sequence[MAXSECTIONS];
 	QLineEdit *SecName[MAXSECTIONS];
 	QSpinBox *qcount[MAXSECTIONS];
@@ -80,6 +87,7 @@ protected:
 	QComboBox *type[MAXSECTIONS][MAXQUIZDATA];
 	QLineEdit *quality[MAXSECTIONS][MAXQUIZDATA];
 	int sectionRowCount[MAXSECTIONS];
+    bool addnewsection, sectiondeleted;
 };
 
 #endif

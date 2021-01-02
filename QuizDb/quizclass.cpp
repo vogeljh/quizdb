@@ -25,26 +25,29 @@
 #include "errmsg.h"
 #include "quizclass.h"
 //
-quizClass::quizClass( int quiznum, int printformat, QString viewer )
+quizClass::quizClass( int quiznum, int sectioncount, int questcount[], int printformat, QString viewer )
 {
 	int i, secnum;
-	QSqlQueryModel qzModel, qModel;
+//	QSqlQueryModel qzModel, qModel;
 	
-	qCquiznum = quiznum;
+    qCquiznum = quiznum;
+    qCsectioncount = sectioncount;
+    for( i=0; i<MAXSECTIONS; i++ )
+        qCquestioncount[i] = questcount[i];
     qCprintformat = printformat;
     qCviewer = viewer;
-
+/*
     qzModel.setQuery( QString( "SELECT ID from QuizFormat" ) );
 	if( qzModel.lastError().isValid() )
 	{
 		Err( qzModel.lastError().text() );
 		return;
 	}
+*/
 
-	for( i=0; i<(qCseccount=qzModel.rowCount()); i++ )
-	{ // -1 next line should be fixed: renumber quizformat data
-		secnum = qzModel.record(i).value(0).toInt()-1;
-        qCsection[secnum] = new quizSectionClass( quiznum, secnum, printformat );
+    for( secnum=0; secnum<qCsectioncount; secnum++ )
+    {
+        qCsection[secnum] = new quizSectionClass( quiznum, secnum, questcount[secnum], printformat );
 	}
 }
 
@@ -73,7 +76,7 @@ int quizClass::makeQuiz()
 	
 	srand( time( NULL ) );
 	
-	for( sec=0; sec<qCseccount; sec++ )
+    for( sec=0; sec<qCsectioncount; sec++ )
 		if( qCsection[sec]->makeSection() < 0 )
 			return( -1 );
 
@@ -82,12 +85,17 @@ int quizClass::makeQuiz()
 
 int quizClass::quizNumber()
 {
-	return( qCquiznum );
+    return( qCquiznum );
 }
 
 int quizClass::sectionCount()
 {
-	return( qCseccount );
+    return( qCsectioncount );
+}
+
+int quizClass::questionCount(int section )
+{
+    return( qCquestioncount[section] );
 }
 
 void quizClass::setPrintFormat( int format )

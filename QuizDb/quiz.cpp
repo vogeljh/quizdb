@@ -98,8 +98,11 @@ void quiz::OkButton_clicked()
 	quizreview *dlg = 0;
 	int quiznum;
     int printformat;
+    int questioncount[MAXSECTIONS];
+    int sectioncount;
 	QSqlQuery query;
-	
+    QSqlQueryModel qmodel;
+
 	if( TimesUsedCheckBox->isChecked() )
 	{
 		query.exec( QString( "UPDATE Questions SET Used = 0" ) );
@@ -133,14 +136,35 @@ void quiz::OkButton_clicked()
 	numquizzes = QuizSpinBox->value();
     printformat = (LaTeXradioButton->isChecked() ? LATEX : RTF );
     if( HighlightKeyCheckBox->isChecked() )
+    {
         printformat += HIGHLIGHT;
+    }
 
-	for( quiznum=0; quiznum<numquizzes; quiznum++ )
+    qmodel.setQuery( QString( "SELECT * FROM QuizFormat" ) );
+    if( qmodel.lastError().isValid() )
+    {
+        Err( qmodel.lastError().text() );
+        return;
+    }
+    sectioncount = qmodel.rowCount();
+    for( int i=0; i<MAXSECTIONS; i++ )
+    {
+        if( i < sectioncount )
+        {
+            questioncount[i] = qmodel.record( i ).value( "count" ).toInt();
+        }
+        else
+        {
+            questioncount[i] = 0;
+        }
+    }
+
+    for( quiznum=0; quiznum<numquizzes; quiznum++ )
 	{
 		statusLabel->setText( QString( "Making Quiz #%1..." ).arg(quiznum+1) );
 		update();
 		qApp->processEvents();
-        qCquiz[quiznum] = new quizClass( quiznum, printformat, pwin->getViewer( printformat ) );
+        qCquiz[quiznum] = new quizClass( quiznum, sectioncount, questioncount, printformat, pwin->getViewer( printformat ) );
 		if( qCquiz[quiznum]->makeQuiz() < 0 )
 		{
 			pwin->Err( "Fatal error making quizzes!" );

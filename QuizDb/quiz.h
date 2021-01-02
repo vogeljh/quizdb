@@ -2,7 +2,7 @@
 #define QUIZ_H
 //
 //#define MAXSECTIONS 4
-//#define MAXQUESTIONS 20
+//#define MAXQUESTIONS 25
 #define MAXQUIZZES 20
 //#define MAXQUIZDATA 30
 //#define MAXNAMELENGTH 16

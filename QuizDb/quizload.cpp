@@ -83,7 +83,7 @@ quizload::quizload ( QWidget* parent, Qt::WindowFlags fl, QSqlQueryModel *tables
 /*$SPECIALIZATION$*/
 void quizload::OK_clicked()
 {
-    int i, numquizzes, quiznum, printformat;
+    int i, numquizzes, quiznum, numsections, numquestions[MAXSECTIONS], printformat;
 	QSqlQuery quizQuery;
 	QSqlQueryModel quizModel;
 	quizreview *dlgreview = 0;
@@ -104,8 +104,8 @@ void quizload::OK_clicked()
 			pwin->Err( quizQuery.lastError().text() );
 		else
 		{
-			quizModel.setQuery( QString( "SELECT * FROM Quiz ORDER BY quiznum" ) );
-			while( quizModel.canFetchMore() )
+            quizModel.setQuery( QString( "SELECT * FROM Quiz ORDER BY quiznum, section, qnum" ) );
+            while( quizModel.canFetchMore() )
 				quizModel.fetchMore();
 
 			if( quizModel.lastError().isValid() )
@@ -115,6 +115,18 @@ void quizload::OK_clicked()
 			}
             numquizzes = quizModel.record(quizModel.rowCount()-1)
                     .value("quiznum").toInt()+1;
+            numsections = quizModel.record(quizModel.rowCount()-1)
+                    .value("section").toInt()+1;
+            for( i=0; i<MAXSECTIONS; i++ )
+            {
+                if( i < numsections )
+                {
+                    quizModel.setQuery( QString( "SELECT * FROM Quiz WHERE quiznum=0 AND section=%1 ORDER BY qnum " ).arg( i ) );
+                    numquestions[i] = quizModel.record(quizModel.rowCount()-1).value("qnum").toInt()+1;
+                }
+                else
+                    numquestions[i] = 0;
+            }
 
             saveTypeModel.setQuery( QString( "SELECT Questtype, Show FROM Types" ) );
 			if( saveTypeModel.lastError().isValid() )
@@ -137,7 +149,7 @@ void quizload::OK_clicked()
 			loaded = true;
 
             for( quiznum=0; quiznum<numquizzes; quiznum++ )
-                qCquiz[quiznum] = new quizClass( quiznum, printformat,
+                qCquiz[quiznum] = new quizClass( quiznum, numsections, numquestions, printformat,
                                                  pwin->getViewer( printformat) );
 
             dlgreview = new quizreview( qCquiz, numquizzes, pwin, Qt::Window,

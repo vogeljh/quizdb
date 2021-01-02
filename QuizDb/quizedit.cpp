@@ -42,7 +42,14 @@ quizedit::quizedit ( QWidget* parent, Qt::WindowFlags fl )
 		return;
 	}
 	numsections = quizFormat.rowCount();
-	quizData.setQuery( QString( "SELECT * FROM QuizData ORDER BY Section, Key" ) );
+    addnewsection = 0;
+    sectiondeleted = 0;
+    if( numsections > MAXSECTIONS )
+    {
+        pwin->Err( "QuizFormat section count exceeds maximum allowed." );
+        return;
+    }
+    quizData.setQuery( QString( "SELECT * FROM QuizData ORDER BY Section, Key" ) );
 	if( quizData.lastError().isValid() )
 	{
 		pwin->Err( quizData.lastError().text() );
@@ -66,17 +73,40 @@ quizedit::quizedit ( QWidget* parent, Qt::WindowFlags fl )
 	QHBoxLayout * h2 = new QHBoxLayout;
 	v0->addLayout( h2 );
 	ok = new QPushButton( "Apply Changes" );
-	cancel = new QPushButton( "Cancel" );
+    addsection = new QPushButton( "Add Section" );
+    cancel = new QPushButton( "Cancel" );
 	h2->addWidget( ok );
-	h2->addSpacing( 20 );
-	h2->addWidget( cancel );
-
-	connect( AddRow[0], SIGNAL(clicked()), this, SLOT(AddRow0_clicked()) );
-	connect( AddRow[1], SIGNAL(clicked()), this, SLOT(AddRow1_clicked()) );
-	connect( AddRow[2], SIGNAL(clicked()), this, SLOT(AddRow2_clicked()) );
-	connect( AddRow[3], SIGNAL(clicked()), this, SLOT(AddRow3_clicked()) );
-	connect( cancel, SIGNAL(clicked()), this, SLOT(close()) );
-	connect( ok, SIGNAL(clicked()), this, SLOT(OK_clicked()) );
+    h2->addSpacing( 20 );
+    h2->addWidget( addsection );
+    h2->addSpacing( 20 );
+    h2->addWidget( cancel );
+/*
+    for( i=0; i<numsections; i++ )
+    {
+        connect( AddRow[i], SIGNAL(clicked()), this, SLOT(AddRow_clicked()[i]) );
+        connect( DeleteSection[i], SIGNAL(clicked()), this, SLOT(DeleteSection_clicked()[i]) );
+    }
+*/
+    connect( AddRow[0], SIGNAL(clicked()), this, SLOT(AddRow0_clicked()) );
+    connect( DeleteSection[0], SIGNAL(clicked()), this, SLOT(DeleteSection0_clicked()) );
+    if( numsections > 1 )
+    {
+        connect( AddRow[1], SIGNAL(clicked()), this, SLOT(AddRow1_clicked()) );
+        connect( DeleteSection[1], SIGNAL(clicked()), this, SLOT(DeleteSection1_clicked()) );
+        if( numsections > 2 )
+        {
+            connect( AddRow[2], SIGNAL(clicked()), this, SLOT(AddRow2_clicked()) );
+            connect( DeleteSection[2], SIGNAL(clicked()), this, SLOT(DeleteSection2_clicked()) );
+            if( numsections > 3 )
+            {
+                connect( AddRow[3], SIGNAL(clicked()), this, SLOT(AddRow3_clicked()) );
+                connect( DeleteSection[3], SIGNAL(clicked()), this, SLOT(DeleteSection3_clicked()) );
+            }
+        }
+    }
+    connect( cancel, SIGNAL(clicked()), this, SLOT(close()) );
+    connect( addsection, SIGNAL(clicked()), this, SLOT(AddSection_clicked()) );
+    connect( ok, SIGNAL(clicked()), this, SLOT(OK_clicked()) );
 }
 
 void quizedit::sectionEditTab( int sec )
@@ -106,7 +136,7 @@ void quizedit::sectionEditTab( int sec )
 	SecName[sec] = new QLineEdit( quizFormat.record( sec ).value( "Name" ).toString() );
 	g1->addWidget( SecName[sec], 1, 1 );
 	qcount[sec] = new QSpinBox;
-	qcount[sec]->setRange( 1, 25 );
+    qcount[sec]->setRange( 1, MAXQUESTIONS );
 	qcount[sec]->setValue( quizFormat.record( sec ).value( "count" ).toInt() );
 	g1->addWidget( qcount[sec], 1, 2 );
 	GenType[sec] = new QComboBox;
@@ -228,16 +258,55 @@ void quizedit::sectionEditTab( int sec )
 	v1->addLayout( h1 );
 	AddRow[sec] = new QPushButton( "Add Row" );
 	h1->addWidget( AddRow[sec] );
-	sectionWidget[sec]->setLayout( v1 );
+    DeleteSection[sec] = new QPushButton( "Delete Section" );
+    h1->addWidget( DeleteSection[sec] );
+    sectionWidget[sec]->setLayout( v1 );
 }
 
 /*$SPECIALIZATION$*/
 void quizedit::AddSection_clicked()
 {
+    QSqlQuery query;
+//    Err( "Add Section Clicked" );
+    if( numsections+1 > MAXSECTIONS )
+    {
+        pwin->Err( "Maximum section count exceeded." );
+        return;
+    }
+    else
+    {
+        query.exec( QString( "INSERT INTO QuizFormat VALUES (%1, \'%2\', %3, %4, \'%5\', %6)" )
+            .arg( numsections+1 ).arg( "New" ).arg( 1 ).arg( 1 ).arg( 'a' ).arg( 0 ) );
+        if( query.lastError().isValid() )
+        {
+            pwin->Err( query.lastError().text() );
+            query.exec( QString( "ROLLBACK" ) );
+            return;
+        }
+        query.clear();
+        addnewsection = 1;
+    }
 }
 
-void quizedit::DeleteSection_clicked()
+
+void quizedit::DeleteSection0_clicked()
 {
+    DeleteExistingSection( 0 );
+}
+
+void quizedit::DeleteSection1_clicked()
+{
+    DeleteExistingSection( 1 );
+}
+
+void quizedit::DeleteSection2_clicked()
+{
+    DeleteExistingSection( 2 );
+}
+
+void quizedit::DeleteSection3_clicked()
+{
+    DeleteExistingSection( 3 );
 }
 
 void quizedit::OK_clicked()
@@ -252,7 +321,20 @@ void quizedit::OK_clicked()
 		return;
 	}
 
-	for( sec=0; sec<numsections; sec++ )
+    for( sec=0; sec<numsections; sec++ )
+    {
+        if( Sequence[sec]->value()-sec-1 )
+        {
+            if( Sequence[Sequence[sec]->value()-1]->value() == Sequence[sec]->value() )
+            {
+                pwin->Err( "Unable to update - duplicate section sequence numbers." );
+                query.exec( QString( "ROLLBACK" ) );
+                return;
+            }
+        }
+    }
+
+    for( sec=0; sec<numsections; sec++ )
 	{
 		if( updateQuizFormat( sec ) < 0 )
 			return;
@@ -266,6 +348,27 @@ void quizedit::OK_clicked()
 		return;
 	}
 //	pwin->LoadQuizData();
+    if( addnewsection )
+    {
+        numsections++;
+    }
+    if( sectiondeleted )
+    {
+        query.exec( QString( "DELETE FROM QuizFormat WHERE ID=%1" ).arg( numsections ) );
+        if( query.lastError().isValid() )
+        {
+            pwin->Err( query.lastError().text() );
+            query.exec( QString( "ROLLBACK" ) );
+        }
+        query.exec( QString( "DELETE FROM QuizData WHERE Section=%1" ).arg( numsections ) );
+        if( query.lastError().isValid() )
+        {
+            pwin->Err( query.lastError().text() );
+            query.exec( QString( "ROLLBACK" ) );
+        }
+        numsections--;
+    }
+
 	close();
 }
 
@@ -274,88 +377,57 @@ int quizedit::updateQuizFormat( int section )
 	int i, newsec;
 	QSqlQuery query;
 	
-	query.exec( QString( "DELETE FROM QuizFormat WHERE ID=%1" ).arg( section+1 ) );
+    newsec = Sequence[section]->value();
+    query.exec( QString( "DELETE FROM QuizFormat WHERE ID=%1" ).arg( newsec ) );
 	if( query.lastError().isValid() )
 	{
 		pwin->Err( query.lastError().text() );
 		query.exec( QString( "ROLLBACK" ) );
 		return( -1 );
 	}
-
-	if( (newsec = Sequence[section]->value()-1) < section )
-	{
-		for( i=section; i>newsec; i-- )
-		{
-			query.exec( QString( "UPDATE QuizFormat SET ID = %1 WHERE ID = %2" ).arg( i+1 ).arg( i ) );
-			if( query.lastError().isValid() )
-			{
-				pwin->Err( query.lastError().text() );
-				query.exec( QString( "ROLLBACK" ) );
-				return( -1 );
-			}
-		}
-	}
-	else if( newsec > section )
-	{
-		for( i=section; i<newsec; i++ )
-		{
-			query.exec( QString( "UPDATE QuizFormat SET ID = %1 WHERE ID = %2" ).arg( i+1 ).arg( i+2 ) );
-			if( query.lastError().isValid() )
-			{
-				pwin->Err( query.lastError().text() );
-				query.exec( QString( "ROLLBACK" ) );
-				return( -1 );
-			}
-			query.clear();
-		}
-	}
+    query.exec( QString( "DELETE FROM QuizData WHERE Section=%1" ).arg( newsec ) );
+    if( query.lastError().isValid() )
+    {
+        pwin->Err( query.lastError().text() );
+        query.exec( QString( "ROLLBACK" ) );
+        return( -1 );
+    }
 	
-	query.exec( QString( "INSERT INTO QuizFormat VALUES (%1, \'%2\', %3, %4, \'%5\', %6)" )
-		.arg( newsec+1 ).arg( SecName[section]->text() )
-		.arg( qcount[section]->value() ).arg( GenType[section]->currentIndex()+1 )
-		.arg( GenQual[section]->text() ).arg( (SecBreak[section]->isChecked()?1:0) ) );
-	if( query.lastError().isValid() )
-	{
-		pwin->Err( query.lastError().text() );
-		query.exec( QString( "ROLLBACK" ) );
-		return( -1 );
-	}
-	query.clear();
-	
-	query.exec( QString( "DELETE FROM QuizData WHERE Section=%1" ).arg( section+1 ) );
-	if( query.lastError().isValid() )
-	{
-		pwin->Err( query.lastError().text() );
-		query.exec( QString( "ROLLBACK" ) );
-		return( -1 );
-	}
-	query.clear();
+    query.exec( QString( "INSERT INTO QuizFormat VALUES (%1, \'%2\', %3, %4, \'%5\', %6)" )
+        .arg( newsec ).arg( SecName[section]->text() )
+        .arg( qcount[section]->value() ).arg( GenType[section]->currentIndex()+1 )
+        .arg( GenQual[section]->text() ).arg( (SecBreak[section]->isChecked()?1:0) ) );
+    if( query.lastError().isValid() )
+    {
+        pwin->Err( query.lastError().text() );
+        query.exec( QString( "ROLLBACK" ) );
+        return( -1 );
+    }
 
-	for( i=0; i<sectionRowCount[section]; i++ )
-	{
-		if( !delrow[section][i]->isChecked() )
-		{
-			query.exec( 
-				QString( "INSERT INTO QuizData (Section, earliest, latest, " )
-				.append( "fewest, most, type, quality) VALUES " )
-				.append( "(%1, %2, %3, %4, %5, %6, '%7')" )
-				.arg( section+1 ).arg( earliest[section][i]->value() )
-				.arg( latest[section][i]->value() )
-				.arg( fewest[section][i]->value() )
-				.arg( most[section][i]->value() )
-				.arg( type[section][i]->currentIndex()+1 )
-				.arg( quality[section][i]->text() ) );
-			if( query.lastError().isValid() )
-			{
-				pwin->Err( query.lastError().text() );
-				query.exec( QString( "ROLLBACK" ) );
-				return( -1 );
-			}
-			query.clear();
-		}
-	}
+    for( i=0; i<sectionRowCount[section]; i++ )
+    {
+        if( !delrow[section][i]->isChecked() )
+        {
+            query.exec(
+                QString( "INSERT INTO QuizData (Section, earliest, latest, " )
+                .append( "fewest, most, type, quality) VALUES " )
+                .append( "(%1, %2, %3, %4, %5, %6, '%7')" )
+                .arg( newsec ).arg( earliest[section][i]->value() )
+                .arg( latest[section][i]->value() )
+                .arg( fewest[section][i]->value() )
+                .arg( most[section][i]->value() )
+                .arg( type[section][i]->currentIndex()+1 )
+                .arg( quality[section][i]->text() ) );
+            if( query.lastError().isValid() )
+            {
+                pwin->Err( query.lastError().text() );
+                query.exec( QString( "ROLLBACK" ) );
+                return( -1 );
+            }
+        }
+    }
 
-	return( 0 );
+    return( 0 );
 }
 
 void quizedit::AddRow0_clicked()
@@ -380,7 +452,7 @@ void quizedit::AddRow3_clicked()
 
 void quizedit::AddNewRow( int tab )
 {
-	delrow[tab][sectionRowCount[tab]]->show();
+    delrow[tab][sectionRowCount[tab]]->show();
 	earliest[tab][sectionRowCount[tab]]->show();
 	latest[tab][sectionRowCount[tab]]->show();
 	fewest[tab][sectionRowCount[tab]]->show();
@@ -390,6 +462,45 @@ void quizedit::AddNewRow( int tab )
 	sectionRowCount[tab]++;
 	AddRow[tab]->hide();
 }
+
+void quizedit::DeleteExistingSection( int sec )
+{
+    QSqlQuery query;
+    if( sec == 0 )
+    {
+        Err( "Section 0 deletion not permitted." );
+        return;
+    }
+    else
+    {
+
+        query.exec( QString( "DELETE FROM QuizFormat WHERE ID=%1" ).arg( numsections ) );
+        if( query.lastError().isValid() )
+        {
+            pwin->Err( query.lastError().text() );
+            query.exec( QString( "ROLLBACK" ) );
+            return;
+        }
+        query.exec( QString( "DELETE FROM QuizData WHERE Section=%1" ).arg( numsections ) );
+        if( query.lastError().isValid() )
+        {
+            pwin->Err( query.lastError().text() );
+            query.exec( QString( "ROLLBACK" ) );
+            return;
+        }
+
+        if( sec+1 < numsections )
+        {
+            for( int i=sec+1; i<numsections; i++ )
+            {
+                Sequence[i]->setValue( i );
+            }
+        }
+        Sequence[sec]->setValue( numsections );
+        sectiondeleted = 1;
+    }
+}
+
 
 void quizedit::Err( QString msg )
 {

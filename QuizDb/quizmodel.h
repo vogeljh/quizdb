@@ -19,7 +19,8 @@ public:
 	bool replace();
 	bool moveUp();
 	bool moveDown();
-	
+    int quizQuestNumber();
+
 private:
 	void refresh();
 	quizview *pwin;

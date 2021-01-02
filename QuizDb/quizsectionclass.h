@@ -7,14 +7,14 @@
 #include <QString>
 #include <QChar>
 #define MAXQUIZDATA 10
-#define MAXQUESTIONS 20
+#define MAXQUESTIONS 25
 #include "quizquestionclass.h"
 //
 class quizSectionClass  
 {
 
 public:
-    quizSectionClass( int quiznum, int sectionnum, int printformat=1 );
+    quizSectionClass( int quiznum, int sectionnum, int questcount, int printformat=1 );
 	virtual ~quizSectionClass();
 	//
 	void Err( QString );
